@@ -1,0 +1,48 @@
+%! TeX program = lualatex
+\documentclass[notes, 10pt, aspectratio=169]{beamer}
+%\documentclass[10pt, aspectratio=169]{beamer}
+
+\usepackage{booktabs}
+\usepackage[style=verbose,backend=biber]{biblatex}
+\addbibresource{../report/main.bib}
+
+% notes
+%\usepackage{pgfpages}
+%\setbeamertemplate{note page}[plain]
+%\setbeameroption{show notes on second screen=right}
+\graphicspath{{../report/graphics/}}
+
+\usetheme[style=fwn]{leidenuniv}
+\useinnertheme{circles}
+\useoutertheme[subsection=false]{miniframes}
+\beamertemplatenavigationsymbolsempty
+
+% uncomment next line to let framesubtitle have palette primary color
+%\setbeamercolor{framesubtitle}{use={palette primary},fg=palette primary.bg}
+
+% uncomment next line to remove navigation symbols from the pdf
+%\setbeamertemplate{navigation symbols}{}
+
+\title{Title}
+\subtitle{Authors: XXXX}
+\author{Siwen Tu and Shupei Li}
+\institute[LIACS]{Leiden Institute of Advanced Computer Science}
+\date{April 11, 2023}
+
+
+\begin{document}
+
+\begin{frame}[plain]
+	\titlepage
+\end{frame}
+
+\begin{frame}
+	\tableofcontents
+\end{frame}
+
+\section{XXXX}
+\begin{frame}
+    \frametitle{XXXXX}
+\end{frame}
+
+\end{document}
