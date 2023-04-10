@@ -65,8 +65,8 @@
         \includegraphics[width=8cm]{edb-mdb.png}
     \end{center}
     \begin{itemize}
-        \item The EDB method utilizes embeddings extracted from the text and videos to model the evaluation of distance.
-        \item The MDB method iterates all text-video pairs to evaluate the distance without extracting embeddings.
+        \item EDB method: Inferior performance due to the lack of feature alignment.
+        \item MDB method: Low efficiency due to the exhaustive scan over the entire database.
     \end{itemize}
 \end{frame}
 
@@ -162,5 +162,38 @@
             \end{itemize}
         \item Summary of strong and weak points.
     \end{itemize}
+\end{frame}
+
+\section*{Appendix}
+\begin{frame}
+    \frametitle{Appendix: Details of GEES}
+    Vanilla NCE loss:
+    \begin{align*}
+        \mathcal{L}_{NCE} = \frac{1}{N}\sum_{i = 1}^N \frac{1}{M}\sum_{j = 1}^M -\log \left( \frac{\exp \left( <V_{ij}^g, T_i^g> \right) }{\exp\left( <V_{ij}^g, T_i^g> \right) + \sum_{(V^{g'}, T^{g'})\in \Phi_i}\exp\left( <V^{g'}, T^{g'}> \right) } \right) 
+    \end{align*}
+    Multivariate Gaussian distribution assumption:
+    \begin{align*}
+        v_i\sim \mathcal{N}\left( \mu_i, \sigma_i \right) 
+    \end{align*}
+    Derive the GEES and its upper bound:
+    \begin{align*}
+        \mathcal{L}_{GEES} &= \frac{1}{N}\sum_{i = 1}^N E_{v_i} \left[ -\log \left(  \frac{\exp \left( <V_{ij}^g, T_i^g> \right) }{\exp\left( <V_{ij}^g, T_i^g> \right) + \sum_{(V^{g'}, T^{g'})\in \Phi_i}\exp\left( <V^{g'}, T^{g'}> \right) }  \right)  \right] \\
+                           &\leq -\frac{1}{N}\sum_{i = 1}^N\log \frac{\exp\left( <T_i^g, \mu_i> + \frac{1}{2}<T_i^g, \sigma_iT_i^g> \right) }{\sum_{j=1}^N\exp\left( <T_i^g, \mu_i> + \frac{1}{2}<T_i^g, \sigma_iT_i^g> \right) } = \bar{\mathcal{L}}_{GEES}
+    \end{align*}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Strategies of training and inference}
+    Training:
+    \begin{align*}
+    \mathcal{L}_{CCM}&= -\frac{1}{N}\sum_{i = 1}^N-\log \left( \frac{\exp\left( <Z_i^v, Z_i^t> \right) }{\exp\left( Z_i^v, Z_i^t \right)+\sum_{(Z^{v'}, Z^{t'})\in \Psi_i}\exp\left( <Z^{v'}, Z^{t'}> \right)  } \right) \\
+    \mathcal{L}_{total} &= \bar{\mathcal{L}}_{GEES} + \alpha \mathcal{L}_{CCM}
+    \end{align*}
+    Inference:
+    \begin{align*}
+        S &= S_g + \beta S_l\\
+        S_l &= \cos\left( Z^v, Z^t \right) \\
+        S_g &= \cos\left( \frac{1}{M}\sum_{j = 1}^M V_{ij}^g, T_i^g \right) 
+    \end{align*}
 \end{frame}
 \end{document}
