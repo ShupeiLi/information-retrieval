@@ -81,19 +81,19 @@
     \frametitle{Two main contributions: CCM \& GEES}
     \textbf{Cross-modal correspondence modeling (CCM)}
     \begin{itemize}
-        \item Utilize transformer decoders to align the features from text and video modalities. 
-        \item Use queries as common centers of features from both modalities.
-        \item Parameters are shared between decoders of two modalities.
-    \end{itemize}
-    \textbf{Gaussian estimation of embedding space (GEES)}
+        \item Utilize the multi-head self-attention mechanism.
     \begin{align*}
         \mathbf{Z}_{c,j} = \text{softmax}\left( \frac{(Q_cW_j^Q)(EW_j^K)^T}{\sqrt{d_k}} \right) (EW_j^V)
     \end{align*}
-    \begin{enumerate}
-        \item Calculate the distance between token features and the query center. Regard the distance as the weight of corresponding features.
-        \item Concatenate and project the aligned features.
-        \item Calculate the similarity score of features from text and video modalities.
-    \end{enumerate}
+        \item Share weights between two decoders.
+        \item Put more importance on features that are close to the query center.
+    \end{itemize}
+    \textbf{Gaussian estimation of embedding space (GEES)}
+    \begin{itemize}
+        \item Traditional NCE loss: A trade-off between accuracy and computing costs.
+        \item Introduce the multivariate Gaussian distribution assumption.
+        \item Enhance the optimization efficiency of SGD.
+    \end{itemize}
 \end{frame}
 
 \section{Experiments}
@@ -160,7 +160,16 @@
                 \item Theoretical contributions.
                 \item Practical applications.
             \end{itemize}
-        \item Summary of strong and weak points.
+        \item Strong points.
+            \begin{itemize}
+                \item Algorithm efficiency.
+                \item Extensive ablation studies and hypothesis tests.
+            \end{itemize}
+        \item Weak points.
+            \begin{itemize}
+                \item Inaccessibility of source code.
+                \item Don't report the standard variance and the number of times of running each model.
+            \end{itemize}
     \end{itemize}
 \end{frame}
 
@@ -183,7 +192,7 @@
 \end{frame}
 
 \begin{frame}
-    \frametitle{Strategies of training and inference}
+    \frametitle{Appendix: Strategies of training and inference}
     Training:
     \begin{align*}
     \mathcal{L}_{CCM}&= -\frac{1}{N}\sum_{i = 1}^N-\log \left( \frac{\exp\left( <Z_i^v, Z_i^t> \right) }{\exp\left( Z_i^v, Z_i^t \right)+\sum_{(Z^{v'}, Z^{t'})\in \Psi_i}\exp\left( <Z^{v'}, Z^{t'}> \right)  } \right) \\
