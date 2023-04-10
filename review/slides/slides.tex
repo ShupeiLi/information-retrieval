@@ -60,7 +60,40 @@
 
 \section{Methodololgy}
 \begin{frame}
-    
+    \frametitle{EDB method versus MDB method}
+    \begin{center}
+        \includegraphics[width=8cm]{edb-mdb.png}
+    \end{center}
+    \begin{itemize}
+        \item The EDB method utilizes embeddings extracted from the text and videos to model the evaluation of distance.
+        \item The MDB method iterates all text-video pairs to evaluate the distance without extracting embeddings.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Overview of the CRET model}
+    \begin{center}
+        \includegraphics[width=7cm]{model.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Two main contributions: CCM \& GEES}
+    \textbf{Cross-modal correspondence modeling (CCM)}
+    \begin{itemize}
+        \item Utilize transformer decoders to align the features from text and video modalities. 
+        \item Use queries as common centers of features from both modalities.
+        \item Parameters are shared between decoders of two modalities.
+    \end{itemize}
+    \textbf{Gaussian estimation of embedding space (GEES)}
+    \begin{align*}
+        \mathbf{Z}_{c,j} = \text{softmax}\left( \frac{(Q_cW_j^Q)(EW_j^K)^T}{\sqrt{d_k}} \right) (EW_j^V)
+    \end{align*}
+    \begin{enumerate}
+        \item Calculate the distance between token features and the query center. Regard the distance as the weight of corresponding features.
+        \item Concatenate and project the aligned features.
+        \item Calculate the similarity score of features from text and video modalities.
+    \end{enumerate}
 \end{frame}
 
 \section{Experiments}
@@ -114,7 +147,7 @@
 
 \section{Critical Review}
 \begin{frame}
-    \frametitle{Critical Review} 
+    \frametitle{Critical review} 
     \begin{itemize}
         \item Readability and structure.
             \begin{itemize}
