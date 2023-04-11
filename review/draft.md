@@ -25,11 +25,10 @@ On the top left of this picture, we estimate the parameters for the distribution
 
 As for the right part of this picture, we can see that we align text and video features using the CCM module to deal with the loss of correspondence details.
 
+Actually, the CCM module utilises the multi-head self-attention mechanism. We align these features using the transformer in which the text and video encoders share the same weights. As we can see from the equation, we rst calculate the distance between the token features and the query centre. Then we regard the distance as the weight of this feature. In this way, we put more importance on the features that are close to the query centre. Afterwards, we concatenate and project the aligned features from the multi-head module, and calculate the similarity score of these aligned features from text and video modalities.
+
 ## Slide 3
 Next, we will discuss more details about the two important parts of this model—CCM module and GEES loss.
-
-Actually, the CCM module utilises the multi-head self-attention mechanism. We align these features using the transformer in which the text and video encoders share the same weights. As we can see from the equation, we rst calculate the distance between the token features and the query centre. Then we regard the distance as the weight of this feature. In this way, we put more importance on the features that are close to the query centre. Afterwards, we concatenate and project the aligned features from the multi-head module, and calculate the similarity score of
-these aligned features from text and video modalities.
 
 Let us move to the GEES loss. The traditional loss function NCE requires a trade-o between the accuracy and computational burden. The author improved this loss function by rst making an assumption about the frame distribution. In detail, we suppose that the frame-level features of each video follow the Multivariate Gaussian Distribution. Then simplify and approximate the NCE function which combines with the assumption. This improvement enhances the optimization efficiency of the SGD algorithm during the training process.
 
