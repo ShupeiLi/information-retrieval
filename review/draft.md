@@ -23,7 +23,7 @@ The text encoder applies the BERT as the base model to encode features into glob
 
 On the top left of this picture, we estimate the parameters for the distribution of the features extracted from the video frames using the global temporal features. Then we calculate the GEES loss according to the estimated parameters and the global text features.
 
-As for the right part of this picture, we can see that we align text and video features using the CCM module.
+As for the right part of this picture, we can see that we align text and video features using the CCM module to deal with the loss of correspondence details.
 
 ## Slide 3
 Next, we will discuss more details about the two important parts of this model—CCM module and GEES loss.
@@ -32,6 +32,8 @@ Actually, the CCM module utilises the multi-head self-attention mechanism. We al
 these aligned features from text and video modalities.
 
 Let us move to the GEES loss. The traditional loss function NCE requires a trade-o between the accuracy and computational burden. The author improved this loss function by rst making an assumption about the frame distribution. In detail, we suppose that the frame-level features of each video follow the Multivariate Gaussian Distribution. Then simplify and approximate the NCE function which combines with the assumption. This improvement enhances the optimization efficiency of the SGD algorithm during the training process.
+
+In a word, we improve the efficiency of the EDB method using the optimized GEES loss and enhance the accuracy by aligning the features from the text and video modalities using the CCM module.
 
 # Experiments
 Authors conducted experiments on four benchmark datasets to verify the effectiveness of CRET method. They select recall at rank K and MdR as metrics. Higher recall at rank K means better performance. Note that MdR measures the median rank of correct items in the retrieved ranking list. Therefore, lower MdR indicates a better model.
