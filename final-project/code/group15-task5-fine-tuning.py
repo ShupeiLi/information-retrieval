@@ -129,9 +129,12 @@ with gzip.open(train_filepath, 'rt') as fIn:
                 score = model_pre.predict([query, passage], show_progress_bar=False).tolist()
             injection_scores.append(score)
         injection_scores = np.array(injection_scores)
-        injection = str(int(np.mean(injection_scores / 50)))
+        injection = np.mean(injection_scores)
+        if injection < 0.5:
+            data_file.write(query + "\t" + "0 [SEP] " + passage + "\t" + str(label) + "\n")
+        else:
+            data_file.write(query + "\t" + "1 [SEP] " + passage + "\t" + str(label) + "\n")
 
-        data_file.write(query + "\t" + injection + " [SEP] " + passage + "\t" + str(label) + "\n")
         cnt += 1
 
         if cnt >= max_train_samples:
