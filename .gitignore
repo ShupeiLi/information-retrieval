@@ -1,3 +1,6 @@
+train_data.txt
+models/
+msmarco-data/
 .DS_Store
 ## Core latex/pdflatex auxiliary files:
 *.aux
