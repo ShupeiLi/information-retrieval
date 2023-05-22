@@ -140,7 +140,7 @@
 %%
 %% Keywords. The author(s) should pick words that accurately describe
 %% the work being presented. Separate the keywords with commas.
-\keywords{cross-encoder, ensemble methods, information retrieval}
+% \keywords{cross-encoder, ensemble methods, information retrieval}
 
 %%
 %% This command processes the author and affiliation and title
@@ -150,10 +150,54 @@
 \section{Introduction}
 
 \section{Task 1: Evaluating cross-encoders}
+\begin{table}[!ht]
+    \centering
+    \caption{Effectiveness results of three fine-tuned cross-encoder models}
+    \label{tab:results-task1}
+    \begin{tabular}{lllll}
+        \toprule
+        \textbf{Model} & \textbf{nDCG@10} & \textbf{Recall@100} & \textbf{MAP@1000} & \textbf{\#Training Steps}\\
+        \midrule
+        MiniLM & \textbf{0.696} & \textbf{0.507} & 0.450 & 47569 / 156250\\
+        TinyBERT & 0.691 & 0.506 & \textbf{0.458} & 76301 / 156250\\
+        distilroberta & 0.611 & 0.463 & 0.392 & 9036 / 156250\\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 \section{Task 2: Select and apply five ensemble methods}
+\begin{table}[!ht]
+    \centering
+    \caption{Effectiveness results of five ensemble methods}
+    \label{tab:results-task2}
+    \begin{tabular}{llll}
+       \toprule
+       \textbf{Model} &  \textbf{nDCG@10} & \textbf{Recall@100} & \textbf{MAP@1000}\\
+       \midrule
+       Mixed & 0.707 & 0.513 & 0.465\\
+       Reciprocal Rank Fusion (RRF) & 0.699 & 0.507 & 0.462\\
+       BayesFuse & 0.697 & 0.507 & 0.451\\
+       PosFuse & \textbf{0.710} & \textbf{0.516} & \textbf{0.480}\\
+       Weighted BordaFuse & 0.707 & 0.511 & 0.464\\
+       \bottomrule
+    \end{tabular}
+\end{table}
 
 \section{Task 3: Analyzing most effective ensemble method}
+\begin{table}[!ht]
+    \centering
+    \caption{Effectiveness results of all combinations}
+    \label{tab:results-task3}
+    \begin{tabular}{llll}
+       \toprule
+       \textbf{Combination} & \textbf{nDCG@10} & \textbf{Recall@100} & \textbf{MAP@1000}\\
+       \midrule
+       MiniLM + TinyBERT & \textbf{0.723} & \textbf{0.518} & \textbf{0.483}\\
+       MiniLM + distilroberta & 0.691 & 0.509 & 0.463\\
+       TinyBERT + distilroberta & 0.694 & 0.507 & 0.468\\
+       \bottomrule
+    \end{tabular}
+\end{table}
 
 \section{Task 4: Modifying the evaluation metric in finetuning}
 
