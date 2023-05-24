@@ -184,6 +184,7 @@
 \end{table}
 
 \section{Task 3: Analyzing most effective ensemble method}
+The PosFuse ensemble method in Task 2 outperforms all other methods. Therefore, we apply PosFuse to all combinations of two models out of three in this task and summarize experimental results in Table \ref{tab:results-task3}.
 \begin{table}[!ht]
     \centering
     \caption{Effectiveness results of all combinations}
@@ -199,17 +200,36 @@
     \end{tabular}
 \end{table}
 
-\section{Task 4: Modifying the evaluation metric in finetuning}
+MiniLM + TinyBERT ensemble performs best on all metrics. MiniLM + distilroberta performs worst on nDCG@10 and MAP@1000, while TinyBERT + distilroberta performs worst on Recall@100. The result is consistent with our expectations. Because MiniLM and TinyBERT achieve significantly better results than distilroberta in Task 1, we think the performance of the ensemble including distilroberta will be affected by the inferiority of distilroberta. There is no big difference between the performance of MiniLM + distilroberta and that of TinyBERT + distilroberta. However, MiniLM + TinyBERT performs much better than other combinations, which may be caused by removing the distilroberta ranking file. It is worth mentioning that MiniLM + TinyBERT even achieves higher scores than the ensemble of three models in Task 2. This pattern indicates that more models do not mean better performance. A weak model may introduce more noise than information, which impairs the model's performance.
+
+\section{Task 4: Modifying the evaluation metric in fine-tuning}
+We modify the CERerankingEvaluator class to change the evaluation metric to nDCG@10. We adopt the implementation in the sklearn package to calculate nDCG@10. Note that the modified class can be easily used by changing the corresponding API in the fine-tuning notebook. No other modification is needed. Our code has been included in the submission.
 
 \section{Task 5: Ensembling through score injection}
+In this task, we investigate the effect of the score injection. The score injection is a strategy described in paper \cite{injection} that aims at improving the performance of BERT-based re-rankers by injecting BM25 scores. However, we inject the average scores of MiniLM, TinyBERT, and distilroberta, instead of BM25 scores. Besides, we use the microsoft/MiniLM-L12-H384-uncased model as the re-ranker. Our modified version of the fine-tuning notebook first performs inference with three models and sets the average score as the first sentence of the document. Then the pairs of queries and injected documents are inputted in the re-ranker. Note that we convert the type of the average score into the integer following the suggestion in \cite{injection}. Due to the GPU quota of Colab, we fine-tune the microsoft/MiniLM-L12-H384-uncased model with and without injection for one hour and run the evaluation notebook. The evaluation results are reported in Table \ref{tab:results-task5}. We also include results in \cite{injection} for comparison.
+\begin{table}[!ht]
+    \centering
+    \caption{Effectiveness results of ensembling with and without score injection}
+    \label{tab:results-task5}
+    \begin{tabular}{llll}
+       \toprule
+       \textbf{Model} & \textbf{nDCG@10} & \textbf{Recall@100} & \textbf{MAP@1000}\\
+       \midrule
+       MiniLM-L12-H384-uncased without injection & 0.668 & \textbf{0.503} & 0.450\\
+       MiniLM-L12-H384-uncased with injection & 0.664 & 0.495 & 0.435\\
+       $\text{MiniLM}_{\text{CAT}}$\cite{injection} & 0.704 & - & 0.452\\
+       $\text{MiniLM}_{\text{BM25CAT}}$\cite{injection} & \textbf{0.711} & - & \textbf{0.463}\\
+       \bottomrule
+    \end{tabular}
+\end{table}
+
+MiniLM with BM25 injection has the best performance during evaluation. The performance of MiniLM with the injection of three BERT-based models' predictions does not achieve the anticipated effect. We think one reason is that the training process is not sufficient. Table \ref{tab:results-task5} indicates that our version of MiniLM without injection is not at the expected level as that of $\text{MiniLM}_{\text{CAT}}$. Another reason may be the instability of the model performance. We notice that MiniLM with the average score injection is not very robust during the training. The improvement of the model's robustness is a possible future direction for developing score injection strategies.
 
 %%
 %% The next two lines define the bibliography style to be used, and
 %% the bibliography file.
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{main}
-
-
 %%
 %% If your work has an appendix, this is the place to put it.
 \end{document}

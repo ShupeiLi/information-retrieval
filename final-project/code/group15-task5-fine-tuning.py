@@ -26,10 +26,10 @@ num_epochs = 1
 pos_neg_ration = 4
 
 max_train_samples = 5e6  # 2e7
-model_name = 'microsoft/MiniLM-L12-H384-uncased'
-model = CrossEncoder(model_name, num_labels=1, max_length=512)
-model_save_path = 'finetuned_models-copy/cross-encoder-' + model_name.replace("/", "-") + '-' + datetime.now().strftime(
-    "%Y-%m-%d_%H-%M-%S")
+#model_name = 'microsoft/MiniLM-L12-H384-uncased'
+#model = CrossEncoder(model_name, num_labels=1, max_length=512)
+#model_save_path = 'finetuned_models-copy/cross-encoder-' + model_name.replace("/", "-") + '-' + datetime.now().strftime(
+#   "%Y-%m-%d_%H-%M-%S")
 
 model1_save_path = "./models/MiniLM"
 model1 = CrossEncoder(model1_save_path, max_length=512)
@@ -130,10 +130,7 @@ with gzip.open(train_filepath, 'rt') as fIn:
             injection_scores.append(score)
         injection_scores = np.array(injection_scores)
         injection = np.mean(injection_scores)
-        if injection < 0.5:
-            data_file.write(query + "\t" + "0 [SEP] " + passage + "\t" + str(label) + "\n")
-        else:
-            data_file.write(query + "\t" + "1 [SEP] " + passage + "\t" + str(label) + "\n")
+        data_file.write(query + "\t" + str(int(injection)) + " [SEP] " + passage + "\t" + str(label) + "\n")
 
         cnt += 1
 
@@ -144,27 +141,27 @@ with gzip.open(train_filepath, 'rt') as fIn:
 
         data_file.close()
 
-count = 0
-with open("./train_data.txt", "r") as file:
-    while True:
-        count += 1
-        line = file.readline()
-        text = line.split("\t")
-        if len(text) == 3:
-            train_samples.append(InputExample(texts=[text[0], text[1]], label=int(text[2])))
-        if count % 10000 == 0:
-            print(f"Line {count} loaded.")
-        if not line:
-            break
-
-train_dataloader = DataLoader(train_samples, shuffle=True, batch_size=train_batch_size)
-evaluator = CERerankingEvaluator(dev_samples, name='train-eval')
-
-# Train the model
-model.fit(train_dataloader=train_dataloader,
-          evaluator=evaluator,
-          epochs=num_epochs,
-          evaluation_steps=1000,
-          warmup_steps=5000,
-          output_path=model_save_path,
-          use_amp=True)
+#count = 0
+#with open("./train_data.txt", "r") as file:
+#    while True:
+#        count += 1
+#        line = file.readline()
+#        text = line.split("\t")
+#        if len(text) == 3:
+#            train_samples.append(InputExample(texts=[text[0], text[1]], label=int(text[2])))
+#        if count % 10000 == 0:
+#            print(f"Line {count} loaded.")
+#        if not line:
+#            break
+#
+#train_dataloader = DataLoader(train_samples, shuffle=True, batch_size=train_batch_size)
+#evaluator = CERerankingEvaluator(dev_samples, name='train-eval')
+#
+## Train the model
+#model.fit(train_dataloader=train_dataloader,
+#          evaluator=evaluator,
+#          epochs=num_epochs,
+#          evaluation_steps=1000,
+#          warmup_steps=5000,
+#          output_path=model_save_path,
+#          use_amp=True)
