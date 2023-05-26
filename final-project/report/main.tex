@@ -116,7 +116,7 @@
 \author{Siwen Tu}
 \author{Shupei Li}
 \affiliation{%
-  \institution{LIACS, Leiden University}
+  \institution{Group 15, LIACS, Leiden University}
   \country{the Netherlands}
 }
 
@@ -151,16 +151,20 @@
 \subsection{Cross-Encoder}
 The two-stage retrieval is a common strategy when it comes to retrieving the relevant documents given a query. The first stage is retrieving from the whole document corpus using lexical matching methods such as the BM25 model. The second stage is re-ranking the retrieved documents with a neural model. Cross-encoder is a popular style of model in the second stage of retrieval, which means organizing task inputs (query and candidate texts) into an input template to feed into a transformer for inference, in contrast with the ``bi-encoder'' design where the queries and candidate texts are encoded independently~\cite{lin2020pretrained}. Figure ~\ref{fig:cross-encoder} illustrates the structure of ``cross-encoder". In this task, we explore how to fine-tune and evaluate the cross-encoder re-rankers and how to ensemble different cross-encoder re-rankers using ensemble methods based on the MS Macro dataset. 
 
-\begin{figure}[H]
+\begin{figure}[!ht]
     \centering
-    \includegraphics[width=0.7\textwidth]
-    {report/cross-encoder.png}
-    \caption{Structure of monoBERT Ranking Model, a Two-input Cross-encode re-ranker, Lin et al}
+    \includegraphics[width=0.5\textwidth]
+    {cross-encoder.png}
+    \caption{Structure of monoBERT ranking model, a two-input cross-encoder re-ranker \cite{lin2020pretrained}.}
     \label{fig:cross-encoder}
 \end{figure}
+
 \subsection{MS Macro Dataset}
 We conduct the experiments on the MS Macro dataset. To be more detailed, we fine-tune the cross-encoder models on the MS Macro dataset and evaluate the performance on the TREC 19 DL dataset which is based on the MS Macro dataset. MS Macro is a collection of datasets focused on deep learning in search provided by Microsoft. In this task, we use the passage retrieval dataset containing 8 million passages extracted from web documents retrieved by Bing~\cite{msmarco}. In the fine-tuning phase, the training sample contains $5\times10^6$ query-passage pairs while the development sample contains 200 queries. However, the MS Macro dataset is sparse where usually only one passage is marked as relevant given a query. So in the evaluation phase, we change to the TREC 19 DL dataset,  which is a more dense annotation dataset and suitable for evaluation. In this task, we use 200 queries for evaluation and only consider the queries which have at least one relevant passage.
+
 \section{Task 1: Evaluating cross-encoders}
+Table ~\ref{tab:results-task1} shows the results obtained from the fine-tuning and evaluation for three specified cross-encoder models. As we can see from Table ~\ref{tab:results-task1}, the training steps of the three models differ significantly. The overall performance of MiniLM and TinyBERT surpasses that of distilroberta, which can be attributed to the significant difference in training steps and the fact that the former two models were pre-trained on the MS Macro dataset, unlike the latter. The performance of the MiniLM and TinyBERT is comparable despite the difference in training steps. The reason might be that the difference in architecture compensates for the difference in training steps and the evaluation dataset is suitable for both models. On the other hand, the values of Recall@100 for the three models are relatively close, in contrast to the other two metrics. This could be attributed to the fact that Recall@100 measures the proportion of relevant passages retrieved among all passages, regardless of the position of the relevant passages. Given that in the MS Macro dataset, the proportion of relevant passages among all passages is small for each query, it is reasonable to expect these three models to perform similarly. 
+
 \begin{table}[!ht]
     \centering
     \caption{Effectiveness results of three fine-tuned cross-encoder models}
@@ -175,12 +179,14 @@ We conduct the experiments on the MS Macro dataset. To be more detailed, we fine
         \bottomrule
     \end{tabular}
 \end{table}
-Table ~\ref{tab:results-task1} shows the results obtained from the fine-tuning and evaluation for three specified cross-encoder models. As we can see from the table ~\ref{tab:results-task1}, the training steps of the three models differ significantly. The overall performance of MiniLM and TinyBERT surpasses that of Distilroberta, which can be attributed to the significant difference in training steps and the fact that the former two models were pre-trained on the MS Macro dataset, unlike the latter. The performance of the MiniLM and TinyBERT is comparable despite the difference in training steps. The reason might be that the difference in architecture compensates for the difference in training steps and the evaluation dataset is suitable for both models. On the other hand, the values of recall@100 for the three models are relatively close, in contrast to the other two metrics. This could be attributed to the fact that recall@100 measures the proportion of relevant passages retrieved among all passages, regardless of the position of the relevant passages. Given that in the MS Macro dataset, the proportion of relevant passages among all passages is small for each query, it is reasonable to expect these three models to perform similarly. 
 
 A higher-performing model is not necessarily more effective for all new, unseen queries. In this task, we train the models on MS Macro dataset and evaluate them on TREC 19 DL dataset. The queries and passages in these two datasets have many common characteristics and structures so the high-performing model tends to perform well during evaluation. However, for new and unseen queries that have different characteristics and distributions from the training dataset, the higher-performing model may not outperform the other models.
 
-As for the limitations of these three models, we can conclude from the results that the training time of these models differs significantly. The training speed of the Distilroberta model is much lower than the other two. So it is essential to take the training time and computational power into account. Besides, these three models are smaller versions of their respective base models. They sacrificed better performance in exchange for effectiveness so they are more suitable for simpler tasks with smaller datasets.
+As for the limitations of these three models, we can conclude from the results that the training time of these models differs significantly. The training speed of the distilroberta model is much lower than the other two. So it is essential to take the training time and computational power into account. Besides, these three models are smaller versions of their respective base models. They sacrificed better performance in exchange for effectiveness so they are more suitable for simpler tasks with smaller datasets.
+
 \section{Task 2: Select and apply five ensemble methods}
+For each ensemble method listed in Table ~\ref{tab:results-task2}, we search for the optimal hyperparameter setting before fusion and adopt the min-max normalization strategy. We can conclude from Table ~\ref{tab:results-task2} that the Posfuse model performs best among five models with an outstanding MAP@1000. The values of nDCG@10 and Recall@100 of five models are similar to each other. The Posfuse model is a probability-based method that relies on the probability of a document appearing at a specific position. It is built upon a perfect probability model constructed using the same queries and results for both training and fusion~\cite{DBLP:conf/sigir/LillisZTCLD10}. During the optimization phase of this fusion task, we utilize queries and results from the MS Macro dataset, which is an integral part of the training dataset. This alignment could be the reason why Posfuse outperforms other methods.
+
 \begin{table}[!ht]
     \centering
     \caption{Effectiveness results of five ensemble methods}
@@ -197,11 +203,11 @@ As for the limitations of these three models, we can conclude from the results t
        \bottomrule
     \end{tabular}
 \end{table}
-Five ensemble methods listed in table ~\ref{tab:results-task2} all require the optimization step and the normalization strategy is min-max. We can conclude from the table ~\ref{tab:results-task2} that the Posfuse model performs best among five models with a outstanding MAP@1000. The values of nDCG@10 and Recall@100 of five models are similar to each other. The Posfuse model is a probability-based method that relies on the probability of a document appearing at a specific position. It is built upon a perfect probability model constructed using the same queries and results for both training and fusion~\cite{DBLP:conf/sigir/LillisZTCLD10}. During the optimization phase of this fusion task, we utilize queries and results from the MS Macro dataset, which is an integral part of the training dataset. This alignment could be the reason why Posfuse outperforms other methods.
 
-In general, the five ensemble models outperform the best single model, TinyBERT, particularly in terms of nDCG@10 and MAP@1000. This outcome confirms that these ensemble methods effectively enhance the retrieval performance of models through their combination. As discussed in task 1, recall@100 measures the proportion of relevant passages retrieved among all passages, without considering the ranked position of the relevant passages. Due to the characteristics of the MS Macro dataset, the improvement of ensemble methods in terms of recall is not as significant when compared to the other two evaluation metrics.
+In general, the five ensemble models outperform the best single model, TinyBERT, particularly in terms of nDCG@10 and MAP@1000. This outcome confirms that these ensemble methods effectively enhance the retrieval performance of models through their combination. As discussed in Task 1, Recall@100 measures the proportion of relevant passages retrieved among all passages, without considering the ranked position of the relevant passages. Due to the characteristics of the MS Macro dataset, the improvement of ensemble methods in terms of recall is not as significant when compared to the other two evaluation metrics.
 
 We could use bagging meta-algorithm to ensemble the models. Bagging mainly focus on combining models of low-bias and high-variance and ensemble them to reduce the variance. At the averaging process of bagging, we could aggregate them through assigning different weights to outputs of different models. During the optimization of the fuse methods, they perform a gird search over the search space of hyperparameters. We could using other fine-tuning methods such as genetic algorithm to find the better hyperparameters. Besides, we could use learning to rank method to explore the optimal combination of rankings from different models.
+
 \section{Task 3: Analyzing the most effective ensemble method}
 The PosFuse ensemble method in Task 2 outperforms all other methods. Therefore, we apply PosFuse to all combinations of two models out of three in this task and summarize experimental results in Table \ref{tab:results-task3}.
 \begin{table}[!ht]
