@@ -4,6 +4,7 @@ A modified version of CERerankingEvaluator*: Evaluation metric from MRR@10 to ND
 * Source link: https://github.com/UKPLab/sentence-transformers/blob/master/sentence_transformers/cross_encoder
 /evaluation/CERerankingEvaluator.py
 """
+
 import logging
 import numpy as np
 import os
